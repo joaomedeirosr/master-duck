@@ -1,99 +1,124 @@
-# Open Duck Mini v2
+# GR1 robot
 
-<table>
-  <tr>
-    <td> <img src="https://github.com/user-attachments/assets/2a407765-70ad-48dd-8a5d-488f82503716" alt="1" width="300px" ></td>
-    <td> <img src="https://github.com/user-attachments/assets/3b8fe350-73a9-4c9f-ad29-efc781be7aee" alt="2" width="300px" ></td>
-    <td> <img src="https://github.com/user-attachments/assets/fd7e5949-1492-4d31-851f-feaa9b695557" alt="3" width="300px" ></td>
-   </tr> 
-</table>
+Queremos treinar uma politica que se adapte bem ao robo real.
 
-We are making a miniature version of the BDX Droid by Disney. It is about 42 centimeters tall with its legs extended.
-The full BOM cost should be under $400 !
+Este e basicamente o problema do Sim2Real, e um problema extremamente dificil, pois e muito complicado pois utilizando servo motores baratos. Primeiro porque este motores tem uma precisao moderada alem de nao serem potentese, com isso replicar os movimentos aprendidos pela politica se torna uma missao complexa.
 
-This repo is kind of a hub where we centralize all resources related to this project. This is a working repo, so there are a lot of undocumented scripts :) We'll try to clean things up at some point.
+## Projetar o modelo 3D preciso do robo
 
+O primeiro passo que devemos realizar consiste em construir um modelo CAD 3D preciso que **aproxime** bem em relacao a estrutura fisica e as caracteristicas fisicas como massa que nosso robo tera.Um aspecto necessario e que este modelo 3D, deve ser exportado em formatos suportados em formatos conhecidos ou *standard* na industria tais como: **URDF,MJCF ou USD**.
 
-# State of sim2real
+Sendo assim, para realizar o projeto do prototipo utilizamos o Fusion360, no qual se mostrou uma ferramenta bastante util e precisa pois foi possivel especificar o material de cada peca do robo.
 
-https://github.com/user-attachments/assets/58721d0f-2f95-4088-8900-a5d02f41bba7
+Com o modelo projetado, realizamos a construcao do protitpo utilizando impressao 3D, mas preciso praticamente todas as pecas do robo foram impressas utilizando o filamento **PLA+** da empresa **eSUN** na impresora **Creality K1C**, exceto por algumas partes adaptcoes feitas que foram impressas utilizando material **TPU** da marca **eSUN** na impressora **Bambu Lab X1C**.Todas as pecas, utilizaram um preenchimento (infill) de 15%.
 
-https://github.com/user-attachments/assets/4129974a-9d97-4651-9474-c078043bb182
+Como comentamos, estamos diante de um problema de *sim2Real* e pra isso precisamos ter o modelo 3D o mais proximo do prototipo do mundo real para que a politica consiga aprender comportamentos locomotores ultraprecisos que se aproximem dos padroes locomotores de um bipede sob acao, da fisica do planeta terra. 
 
-https://github.com/user-attachments/assets/a0afcd38-15d8-40c6-8171-a619107406b8
+Portanto, na tentativa de ter o modelo 3D mais preciso possivel utilizamos a estrategia de coletar as informacoes bastante precisas de massa de filamento PLA gasto para produzir as pecas em 3D, fornecidas pelo software fatidor OrcaSlicer e com isso, foi possivel construir um modelo 3D que sera utilizado na simulacao bastante proximo do prototipo real.
 
 
-# Updates
+## Importando o modelo 3D do robo para o simulador
 
-> Update 02/04/2024: You can try two policies we trained : [this one](BEST_WALK_ONNX.onnx) and [this one](BEST_WALK_ONNX_2.onnx)
-> Run with the following arguments :
-> python v2_rl_walk_mujoco.py --onnx_model_path ~/BEST_WALK_ONNX_2.onnx
+Agora com o software pronto utilizamos o plug-in chamado fusion2urdf, para exportar a montagem do robo projetado no software CAD Fusion360 direto para o nosso simulador.
 
-> Update 15/03/2025: join our discord server to get help or show us your duck :) https://discord.gg/UtJZsgfQGe
-
-> Update 07/02/2025: Big progress on sim2real, see videos above :)
-
-> Update 24/02/2025: Working hard on sim2real ! 
-
-> Update 07/02/2025 : We are writing documentation on the go, but the design and BOM should not change drastically. Still missing the "expression" features, but they can be added after building the robot!
-
-> Update 22/01/2025 : The mechanical design is pretty much finalized (fixing some mistakes here and there). The current version does not include all the "expression" features we want to include in the final robot (LEDs for the eyes, a camera, a speaker and a microphone). We are now working on making it walk with reinforcement learning !
-
-# Community 
-
-![duck_collage](https://github.com/user-attachments/assets/e240c06e-769f-4c87-b65f-189a442cf1e9)
-
-Join our discord community ! https://discord.gg/UtJZsgfQGe
-
-# CAD
-
-https://cad.onshape.com/documents/64074dfcfa379b37d8a47762/w/3650ab4221e215a4f65eb7fe/e/0505c262d882183a25049d05
-
-See [this document](docs/prepare_robot.md) for getting from a onshape design to a simulated robot in MuJoCo (Warning, outdated. Has not been updated in a while)
-
-# RL stuff
-
-We are switching to Mujoco Playground, see this [repo](https://github.com/apirrone/Open_Duck_Playground)
-
-https://github.com/user-attachments/assets/037a1790-7ac1-4140-b154-2c901d20d5f5
+Este plug-in exporta as descricoes da estrutura da malha do robo projetada no software 3D para o formato URDF/MJCF para um formato MJX leve e preciso que o simulador consegue ler e renderizar. E portanto, com isso temos uma descricao MJCF que descreve com precisao as massas e os momentos de inercia do robo completo.
 
 
-## Reference motion generation for imitation learning 
 
-https://github.com/user-attachments/assets/4cb52e17-99a5-47a8-b841-4141596b7afb
+## Motores e servoatuadores
+Um aspecto de extrema importancia, para se ter um modelo preciso pricipalmente no contexto do sim2Real e modelar o comportamento dos motores/servoatuadores. Para isso, utilizamos uma ferramenta que nos auxiliou neste processo de modelagem chamada BAM (Better Actuator Model) esta ferramenta nos ajuda no seguinte contexto: 
 
-See [this repo](https://github.com/apirrone/Open_Duck_reference_motion_generator)
+>Modelos precisos de servoatuadores são essenciais para a simulação de sistemas robóticos. Isso é particularmente importante ao realizar Aprendizado por Reforço (AR) em robôs reais, pois a precisão do modelo impacta diretamente a transferibilidade da política aprendida.
 
-## Actuator identification 
+> Os simuladores atuais amplamente utilizados, como MuJoCo ou IsaacGym geralmente modelam o atrito atraves da implementacao da modelagem do atrito de Coulumb-Viscoso, que e muito simplista para representar com precisao os fenomenos de atrito complexos que o robo vai experimentar em operacao nesse caso seria interessante ter modelos como o efeito Stribeck, a dependencia da carga ou os efeitos quadraticos.
 
-We used Rhoban's [BAM](https://github.com/Rhoban/bam)
+Portanto, a ferramenta BAM propoe:
 
-# BOM
+- Criar um processo de identificação para ajustar modelos de fricção a partir de trajetórias registradas;
+- Fornecer um conjunto de modelos de fricção estendidos que capturam fenômenos de fricção complexos,
+- Compartilhar uma biblioteca de modelos de atrito identificados para servos comuns como o utilizado pro nos Feetech STS3215;
+- Fornecer uma API simples para utilizar esses modelos de atrito em simuladores como o MuJoCo.
 
-https://docs.google.com/spreadsheets/d/1gq4iWWHEJVgAA_eemkTEsshXqrYlFxXAPwO515KpCJc/edit?usp=sharing
+Para mais detalhes: (leia este [artigo](https://arxiv.org/pdf/2410.08650v1))
 
-Chinese: https://zihao-ai.feishu.cn/wiki/AfAtw69vRigXaRk5UkbcrAiLnJw?from=from_copylink
+É crucial para nosso robo que o simulador simule os motores com precisão, pois treinaremos uma política (uma rede neural) para gerar posições dos motores com base em entradas sensoriais (posições/velocidades dos motores, IMU e sensores de fim de curso presente nos pes do robo). Se os motores se comportarem de maneira diferente na simulação do que no mundo real, a política não funcionará ou, na pior das hipóteses, produzirá padroes locomotores altamente nao lineares e movimentos caóticos .
 
-# Build Guide
+E com a ferramenta BAM, podemos exportar os principais parametros necessarios para unidades MuJoCo que estara presente no nosso arquivo de descricao MJFC.Como estamos utilizando motores Feetech STS3215 encontraremos no nosso arquivo de descicao MJFC o seguinte:
 
-> New : you can now use the Tnkr guide ! https://tnkr.ai/explore/docs/open-duck-mini/open-duck-mini-v2#home
+```json
+    "kt": 1.21164135295077,
+    "R": 2.6761663274455603,
+    "armature": 0.02840336348682085,
+    "q_offset": -0.05116067663549731,
+    "friction_base": 0.05239296084748866,
+    "friction_viscous": 0.05908515565091076,
+    "model": "m1",
+    "actuator": "sts3215"
 
-Chinese: https://zihao-ai.feishu.cn/wiki/space/7488517034406625281
+```
+Alem deste, valores estarao presentes nas propriedades dos atuadores e das juntas tambem:
 
-## Print Guide
+- amortecimento;
+- perda por atrito;
+- kp;
+- alcance de forca;
 
-See [print_guide](docs/print_guide.md).
+## Treinando uma nova Politica
 
-## Assembly Guide
+Usamos nossa própria estrutura baseada no [mujoco playground](https://github.com/google-deepmind/mujoco_playground), o [Open Duck Playground](https://github.com/apirrone/Open_Duck_Playground)
 
-See [assembly guide (incomplete)](docs/assembly_guide.md).
+No ambiente [joystick](https://github.com/apirrone/Open_Duck_Playground/blob/main/playground/open_duck_mini_v2/joystick.py), você pode tentar ativar/desativar diferentes recompensas, escrever as suas próprias, brincar com os pesos, ruído, aleatorização etc.
 
-# Embedded runtime
+Obtivemos bons resultados implementando a recompensa por imitação descrita pela Disney em seu [artigo BDX](https://github.com/apirrone/Open_Duck_Playground/blob/main/playground/open_duck_mini_v2/joystick.py).
 
-This repo contains the code to run the policies on the onboard computer (Raspberry pi zero 2w) https://github.com/apirrone/Open_Duck_Mini_Runtime
+Para usar essa recompensa, precisamos de movimentos de referência. Criamos [este repositório](https://github.com/apirrone/Open_Duck_reference_motion_generator) para gerar esses movimentos usando um mecanismo de caminhada paramétrica. Seguindo as instruções lá, você pode gerar um arquivo `polynomial_coefficients.pkl` que contém os movimentos de referência. Já existe um arquivo desse tipo no repositório do playground, no diretório `data/`.
 
-# Training your own policies
+Após o treinamento da sua política, você pode tentar executá-la no robô real usando [este script](https://github.com/apirrone/Open_Duck_Mini_Runtime/blob/v2/scripts/v2_rl_walk_mujoco.py) no repositório do runtime. Certifique-se de ter concluído todas as etapas da [lista de verificação](https://github.com/apirrone/Open_Duck_Mini_Runtime/blob/v2/checklist.md) antes de executar o script.
 
-If you want to train your own policies, and contribute to making the ducks walk nicely, see [this document](docs/sim2real.md)
+## Treinamento da politica
+Seguir este passos:
+https://github.com/apirrone/Open_Duck_Playground
 
-> Thanks a lot to HuggingFace and Pollen Robotics for sponsoring this project !
+## Gerando movimentos para treinar uma imitational reward
+
+Seguir estes passos:
+https://github.com/apirrone/Open_Duck_reference_motion_generator
+
+Biblioteca para gerar os movimentos: https://github.com/Rhoban/placo
+
+Ambiente alternativo utilizando Isaac Gym: https://github.com/rimim/AWD
+
+Dar uma olhada neste outra paret do repo:
+
+https://github.com/SteveNguyen/openduckminiv2_playground
+
+
+## Levando o modelo treinado para o robo
+
+Olhar: https://github.com/apirrone/Open_Duck_Mini_Runtime
+
+---
+
+## Notas:
+O que sao os formatos URDF,MJCF e Open USD?
+
+Estes formatos sao formatos suportados por alguns do simuladores de fisica realistica mais precisos e utilizados da industria
+
+- URDF: Unified Robot Description File, basicamente consiste em um conjunto de tags xml, que representam a estrutura ou esqueleto do robo, este formato e muito utilizado junto com o ROS2 e seu arquivo de visualizacao de malhas geometricas Rviz.
+
+- MJCF: TODO
+
+
+- USD: O Universal Scene Description, basicamente assim como o URDF, tambem e 
+
+
+## Referencias
+Parametros dos modelos de atrito de servoatuadores comerciais:
+
+- https://github.com/Rhoban/bam/tree/main/bam/params
+
+- https://github.com/syuntoku14/fusion2urdf
+
+- https://developer.nvidia.com/blog/using-openusd-for-modular-and-scalable-robotic-simulation-and-development/
+
+- https://github.com/apirrone/Open_Duck_Playground/blob/main/playground/open_duck_mini_v2/joystick.py
