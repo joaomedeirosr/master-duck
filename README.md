@@ -6,16 +6,28 @@ Este e basicamente o problema do Sim2Real, e um problema extremamente dificil, p
 
 ## Projetar o modelo 3D preciso do robo
 
-O primeiro passo que devemos realizar consiste em construir um modelo CAD 3D preciso que **aproxime** bem em relacao a estrutura fisica e as caracteristicas fisicas como massa que nosso robo tera.Um aspecto necessario e que este modelo 3D, deve ser exportado em formatos suportados em formatos conhecidos ou *standard* na industria tais como: **URDF,MJCF ou USD**.
+O primeiro passo que devemos realizar consiste em construir um modelo CAD 3D preciso que **aproxime** bem em relacao a estrutura fisica e as caracteristicas fisicas como massa que nosso robo tera.Um aspecto necessario e que este modelo 3D, deve ser exportado em formatos suportados ou formatos *standard* na industria tais como: **URDF,MJCF ou USD**.
 
-Sendo assim, para realizar o projeto do prototipo utilizamos o Fusion360, no qual se mostrou uma ferramenta bastante util e precisa pois foi possivel especificar o material de cada peca do robo.
+Sendo assim, para realizar o projeto do prototipo utilizamos o Fusion360, no qual se mostrou uma ferramenta muito util e precisa, permitindo criar a especificacao do material para cada peca do robo.
 
-Com o modelo projetado, realizamos a construcao do protitpo utilizando impressao 3D, mas preciso praticamente todas as pecas do robo foram impressas utilizando o filamento **PLA+** da empresa **eSUN** na impresora **Creality K1C**, exceto por algumas partes adaptcoes feitas que foram impressas utilizando material **TPU** da marca **eSUN** na impressora **Bambu Lab X1C**.Todas as pecas, utilizaram um preenchimento (infill) de 15%.
+Com o modelo 3D projetado no Fusion, realizamos a construcao do protitpo utilizando impressao 3D. Para a impressao das partes do robo foi utilizado praticamente para todas as parte do robo o filamento plastico Poliácido Láctico (**PLA+**) da empresa **eSUN** na impresora **Creality K1C**, exceto por algumas partes que necessitaram de adaptcoes, adaptacoes estas que foram impressas utilizando material Poliuretano Termoplastico (**TPU**) da marca **eSUN** na impressora **Bambu Lab X1C**.
 
-Como comentamos, estamos diante de um problema de *sim2Real* e pra isso precisamos ter o modelo 3D o mais proximo do prototipo do mundo real para que a politica consiga aprender comportamentos locomotores ultraprecisos que se aproximem dos padroes locomotores de um bipede sob acao, da fisica do planeta terra. 
+Esta adaptacao, foi necessaria para os pes do robo, pois utilizando PLA, o robo enfrentava dificuldades para ficar de pe e caminhar uma vez que o PLA, por ser um material liso, nao gerava atrito necessario para os pes do robo. Isso ocasinou condicoes de escorregamento e baixa adarencia com a superficie de movimento. 
+Sendo assim, para resolver este problema, apos um estudo sobre a composicao dos filamentos plasticos foi tomada a decisao de se utilizar o TPU, por se tratar de um material flexivel, elastico e com alta capacidade de absorcao a vibracoes. O TPU e capaz de proporcionar para a maquina, uma interface de amortecimento atuando como uma especie de sapato com amortecedor, semelhante a tenis de caminhada que humanos utilizam veja a imagem: 
 
-Portanto, na tentativa de ter o modelo 3D mais preciso possivel utilizamos a estrategia de coletar as informacoes bastante precisas de massa de filamento PLA gasto para produzir as pecas em 3D, fornecidas pelo software fatidor OrcaSlicer e com isso, foi possivel construir um modelo 3D que sera utilizado na simulacao bastante proximo do prototipo real.
+<div style="display: flex; justify-content: center; gap: 20px;">
+  <img src="/img/foot.png" alt="Sapato GR1 - Vista superior" width="450">
+  <img src="/img/foot-top.png" alt="Sapato GR1 - Vista infeerior" width="450">
+</div>
 
+O uso, desta estrategia foi capaz de proporcionar: absorcao a impactos, resistencia a oleos, deformacoes e que no fim, proporcionam excelente aderencia e estabilidade ao robo.
+
+
+Como comentamos, estamos diante de um problema de *sim2Real* e pra isso precisamos ter o modelo 3D o mais proximo do prototipo do mundo real para que a politica consiga aprender comportamentos locomotores ultraprecisos que se aproximem dos padroes locomotores de um bipede sob acao da fisica do planeta terra, porem como as pecas, foram construidas utilizando um preenchimento de manterial (infill) de 15%, isso aumenta a massa de cada peca.
+
+Portanto, na tentativa de obter um modelo de simulação o mais fiel possível ao protótipo físico e devido à natureza do problema, tornou-se necessário coletar informações referentes à massa de filamento PLA e TPU empregada na fabricação de cada componente. Para isso, utilizou-se o software Open Source OrcaSlicer, um software de fatiamento que permite inspecionar cada camada da impressão 3D e fornece informações detalhadas sobre o consumo de material, tempo de impressão e massa estimada de cada peça. Essas informações foram então utilizadas para parametrizar o modelo de simulação do robô no software OpenSource MuJoCo, atribuindo propriedades físicas mais próximas daquelas observadas no protótipo real. Dessa forma, o modelo utilizado na simulação representa, com maior fidelidade, o comportamento dinâmico esperado do robô físico.
+
+Vale ressaltar que esse modelo não corresponde ao modelo CAD utilizado durante o projeto mecânico no Fusion 360. Trata-se de um modelo físico de simulação, desenvolvido especificamente para o MuJoCo, no qual são definidas propriedades como massa, inércia, geometrias de colisão, atuadores e juntas, necessárias para a simulação da dinâmica do robô. As informações obtidas pelo OrcaSlicer foram utilizadas para aproximar esses parâmetros das características do protótipo físico.
 
 ## Importando o modelo 3D do robo para o simulador
 
